@@ -1,3 +1,5 @@
+const styleguide = require('@vercel/style-guide');
+
 module.exports = {
-  plugins: ["prettier-plugin-tailwindcss"],
+  plugins: [...styleguide.plugins, 'prettier-plugin-tailwindcss'],
 };
