@@ -4,10 +4,10 @@ const {
   customers,
   revenue,
   users,
-} = require('../app/lib/placeholder-data');
+} = require('../app/lib/placeholder-data.js');
 const bcrypt = require('bcrypt');
 
-const seedUsers = async (client) => {
+async function seedUsers(client) {
   try {
     await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
     // Create the "users" table if it doesn't exist
@@ -22,16 +22,15 @@ const seedUsers = async (client) => {
 
     console.log(`Created "users" table`);
 
-    // Insert data into the "users table"
+    // Insert data into the "users" table
     const insertedUsers = await Promise.all(
       users.map(async (user) => {
         const hashedPassword = await bcrypt.hash(user.password, 10);
-
         return client.sql`
-          INSERT INTO users (id, name, email, password)
-          VALUES (${user.id}, ${user.anme}, ${user.email}, ${hashedPassword})
-          ON CONFLICT (id) DO NOTHING;
-        `;
+        INSERT INTO users (id, name, email, password)
+        VALUES (${user.id}, ${user.name}, ${user.email}, ${hashedPassword})
+        ON CONFLICT (id) DO NOTHING;
+      `;
       }),
     );
 
@@ -42,25 +41,25 @@ const seedUsers = async (client) => {
       users: insertedUsers,
     };
   } catch (error) {
-    console.error(`Error seeding users: ${error}`);
+    console.error('Error seeding users:', error);
     throw error;
   }
-};
+}
 
-const seedInvoices = async (client) => {
+async function seedInvoices(client) {
   try {
     await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
 
     // Create the "invoices" table if it doesn't exist
     const createTable = await client.sql`
-      CREATE TABLE IF NOT EXISTS invoices (
-        id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-        customer_id UUID NOT NULL,
-        amount INT NOT NULL,
-        status VARCHAR(255) NOT NULL,
-        date DATE NOT NULL
-      );
-    `;
+    CREATE TABLE IF NOT EXISTS invoices (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    customer_id UUID NOT NULL,
+    amount INT NOT NULL,
+    status VARCHAR(255) NOT NULL,
+    date DATE NOT NULL
+  );
+`;
 
     console.log(`Created "invoices" table`);
 
@@ -82,22 +81,22 @@ const seedInvoices = async (client) => {
       invoices: insertedInvoices,
     };
   } catch (error) {
-    console.error(`Error seeding invoices: ${error}`);
+    console.error('Error seeding invoices:', error);
     throw error;
   }
-};
+}
 
-const seedCustomers = async (client) => {
+async function seedCustomers(client) {
   try {
     await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
 
     // Create the "customers" table if it doesn't exist
     const createTable = await client.sql`
       CREATE TABLE IF NOT EXISTS customers (
-        id UUID DEFAULT uuid_generate_v4() PRIMARY KEY
+        id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         email VARCHAR(255) NOT NULL,
-        image_url VARCHAR(255) NOT NULL,
+        image_url VARCHAR(255) NOT NULL
       );
     `;
 
@@ -121,13 +120,14 @@ const seedCustomers = async (client) => {
       customers: insertedCustomers,
     };
   } catch (error) {
-    console.error(`Error seeding customers: ${error}`);
+    console.error('Error seeding customers:', error);
     throw error;
   }
-};
+}
 
-const seedRevenue = async (client) => {
+async function seedRevenue(client) {
   try {
+    // Create the "revenue" table if it doesn't exist
     const createTable = await client.sql`
       CREATE TABLE IF NOT EXISTS revenue (
         month VARCHAR(4) NOT NULL UNIQUE,
@@ -155,12 +155,12 @@ const seedRevenue = async (client) => {
       revenue: insertedRevenue,
     };
   } catch (error) {
-    console.error(`Error seeding revenue: ${error}`);
+    console.error('Error seeding revenue:', error);
     throw error;
   }
-};
+}
 
-const main = async () => {
+async function main() {
   const client = await db.connect();
 
   await seedUsers(client);
@@ -169,10 +169,11 @@ const main = async () => {
   await seedRevenue(client);
 
   await client.end();
-};
+}
 
-main().catch((error) => {
+main().catch((err) => {
   console.error(
-    `An error occurred while attempting to seed the database: ${error}`,
+    'An error occurred while attempting to seed the database:',
+    err,
   );
 });
