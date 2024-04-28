@@ -7,6 +7,7 @@
     "dev": "next dev",
     "format": "prettier . --write",
     "lint": "next lint",
+    "seed": "node -r dotenv/config ./scripts/seeds.js",
     "start": "next start"
   },
   "prettier": "@vercel/style-guide/prettier",
