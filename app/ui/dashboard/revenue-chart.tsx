@@ -6,6 +6,7 @@
 
 import { Revenue } from '@/app/lib/definitions';
 import { generateYAxis } from '@/app/lib/utils';
+import { lusitana } from '../fonts';
 
 export default async function RevenueChart({
   revenue,

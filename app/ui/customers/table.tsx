@@ -1,5 +1,6 @@
 import { FormattedCustomersTalbe } from '@/app/lib/definitions';
 import Image from 'next/image';
+import { lusitana } from '../fonts';
 import Search from '../search';
 
 export default async function CustomersTable({
