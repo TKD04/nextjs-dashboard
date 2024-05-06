@@ -1,4 +1,5 @@
 import { sql } from '@vercel/postgres';
+import { unstable_noStore } from 'next/cache';
 import {
   CustomerField,
   CustomersTableType,
@@ -14,17 +15,18 @@ import { formatCurrency } from './utils';
 export const fetchRevenue = async (): Promise<Revenue[]> => {
   // Add noStore() here to prevent the response from being cached.
   // This is equivalent to in fetch(..., { cache: "no-store" }).
+  unstable_noStore();
 
   try {
     // Artificially delay a response for demo purposes.
     // Don't do this in production :)
 
-    // console.log("Fetching revenue data...");
-    // await new Promise((resolve) => setTimeout(resolve, 3000));
+    console.log('Fetching revenue data...');
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     const data = await sql<Revenue>`SELECT * FROM revenue`;
 
-    // conjsole.log("Data fetch completed after 3 seconds.")
+    console.log('Data fetch completed after 3 seconds.');
 
     return data.rows;
   } catch (error) {
@@ -34,6 +36,7 @@ export const fetchRevenue = async (): Promise<Revenue[]> => {
 };
 
 export const fetchLatestInvoices = async (): Promise<LatestInvoice[]> => {
+  unstable_noStore();
   try {
     const data = await sql<LatestInvoiceRaw>`
       SELECT invoices.amount, customers.name, customers.image_url, customers.email, invoices.id
@@ -60,6 +63,7 @@ export const fetchCardData = async (): Promise<{
   totalPaidInvoices: string;
   totalPendingInvoices: string;
 }> => {
+  unstable_noStore();
   try {
     // You can probably combine these into a single SQL query.
     // However, we are intentionally splitting them to demonstrate
@@ -101,6 +105,7 @@ export const fetchFilteredInvoices = async (
   query: string,
   currentPage: number,
 ): Promise<InvoicesTable[]> => {
+  unstable_noStore();
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
   try {
@@ -133,6 +138,7 @@ export const fetchFilteredInvoices = async (
 };
 
 export const fetchInvoicesPages = async (query: string): Promise<number> => {
+  unstable_noStore();
   try {
     const count = await sql`
       SELECT COUNT(*) FROM invoices
@@ -155,6 +161,7 @@ export const fetchInvoicesPages = async (query: string): Promise<number> => {
 };
 
 export const fetchInvoiceById = async (id: string) => {
+  unstable_noStore();
   try {
     const data = await sql<InvoiceForm>`
       SELECT
@@ -180,6 +187,7 @@ export const fetchInvoiceById = async (id: string) => {
 };
 
 export const fetchCustomers = async () => {
+  unstable_noStore();
   try {
     const data = await sql<CustomerField>`
       SELECT
@@ -199,6 +207,7 @@ export const fetchCustomers = async () => {
 };
 
 export const fetchFilteredCustomers = async (query: string) => {
+  unstable_noStore();
   try {
     const data = await sql<CustomersTableType>`
       SELECT
