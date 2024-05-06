@@ -64,7 +64,7 @@ export const fetchCardData = async (): Promise<{
     // You can probably combine these into a single SQL query.
     // However, we are intentionally splitting them to demonstrate
     // how to initialize multiple queries in parallel with JS.
-    const invoiceCountPromise = sql`SELECTS COUNT(*) FROM invoices`;
+    const invoiceCountPromise = sql`SELECT COUNT(*) FROM invoices`;
     const customerCountPromise = sql`SELECT COUNT(*) FROM customers`;
     const invoiceStatusPromise = sql`SELECT
       SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) AS "paid",
