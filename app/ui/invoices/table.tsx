@@ -1,8 +1,8 @@
 import { fetchFilteredInvoices } from '@/app/lib/data';
 import { formatCurrency, formatDateToLocal } from '@/app/lib/utils';
+import { DeleteInvoice, UpdateInvoice } from '@/app/ui/invoices/buttons';
+import InvoiceStatus from '@/app/ui/invoices/status';
 import Image from 'next/image';
-import { DeleteInvoice, UpdateInvoice } from './buttons';
-import InvoiceStatus from './status';
 
 export default async function InvoicesTable({
   query,
@@ -28,6 +28,7 @@ export default async function InvoicesTable({
                     <div className="mb-2 flex items-center">
                       <Image
                         src={invoice.image_url}
+                        className="mr-2 rounded-full"
                         width={28}
                         height={28}
                         alt={`${invoice.name}'s profile picture`}
@@ -86,10 +87,10 @@ export default async function InvoicesTable({
                     <div className="flex items-center gap-3">
                       <Image
                         src={invoice.image_url}
+                        className="rounded-full"
                         width={28}
                         height={28}
                         alt={`${invoice.name}'s profile picture`}
-                        className="rounded-full"
                       />
                       <p>{invoice.name}</p>
                     </div>

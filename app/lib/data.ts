@@ -72,7 +72,7 @@ export const fetchCardData = async (): Promise<{
     const customerCountPromise = sql`SELECT COUNT(*) FROM customers`;
     const invoiceStatusPromise = sql`SELECT
       SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) AS "paid",
-      SUM (CASE WHEN status = 'pending' THEN amount ELSE 0 END) AS "pending"
+      SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END) AS "pending"
       FROM invoices
     `;
 
@@ -119,13 +119,13 @@ export const fetchFilteredInvoices = async (
         customers.email,
         customers.image_url
       FROM invoices
-      JOIN customers ON invoices.customer_id = customer.id
+      JOIN customers ON invoices.customer_id = customers.id
       WHERE
-        customers.name ILIKE ${`%${query}`} OR
-        customers.email ILIKE ${`%${query}`} OR
-        invoices.amount::text ILIKE ${`%${query}`} OR
-        invoices.date::text ILIKE ${`%${query}`} OR
-        invoices.status ILIKE ${`%${query}`} OR
+        customers.name ILIKE ${`%${query}%`} OR
+        customers.email ILIKE ${`%${query}%`} OR
+        invoices.amount::text ILIKE ${`%${query}%`} OR
+        invoices.date::text ILIKE ${`%${query}%`} OR
+        invoices.status ILIKE ${`%${query}%`}
       ORDER BY invoices.date DESC
       LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
     `;
@@ -144,11 +144,11 @@ export const fetchInvoicesPages = async (query: string): Promise<number> => {
       SELECT COUNT(*) FROM invoices
       JOIN customers ON invoices.customer_id = customers.id
       WHERE
-        customers.name ILIKE ${`%${query}`} OR
-        customers.email ILIKE ${`%${query}`} OR
-        invoices.amount::text ILIKE ${`%${query}`} OR
-        invoices.date::text ILIKE ${`%${query}`} OR
-        invoices.status ILIKE ${`%${query}`} OR
+        customers.name ILIKE ${`%${query}%`} OR
+        customers.email ILIKE ${`%${query}%`} OR
+        invoices.amount::text ILIKE ${`%${query}%`} OR
+        invoices.date::text ILIKE ${`%${query}%`} OR
+        invoices.status ILIKE ${`%${query}%`}
     `;
 
     const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
@@ -168,7 +168,7 @@ export const fetchInvoiceById = async (id: string) => {
         invoices.id,
         invoices.customer_id,
         invoices.amount,
-        invoices.status,
+        invoices.status
       FROM invoices
       WHERE invoices.id = ${id};
     `;
@@ -214,13 +214,13 @@ export const fetchFilteredCustomers = async (query: string) => {
         customers.id,
         customers.name,
         customers.email,
-        cusotmers.iamge_url,
+        customers.image_url,
         COUNT(invoices.id) AS total_invoices,
         SUM(CASE WHEN invoices.status = 'pending' THEN invoices.amount ELSE 0 END) AS total_pending,
-        SUM(CASE WHEN invoices.status = 'paid' THEN invoices.amount ELSE 0 END) AS total_paid,
+        SUM(CASE WHEN invoices.status = 'paid' THEN invoices.amount ELSE 0 END) AS total_paid
       FROM customers
-      LEFT JOIN invoices ON customers.id = invoices.cusotomer_id
-      WHERE customers.anme ILIKE ${`%${query}%`} OR customers.email ILIKE ${`%${query}%`}
+      LEFT JOIN invoices ON customers.id = invoices.customer_id
+      WHERE customers.name ILIKE ${`%${query}%`} OR customers.email ILIKE ${`%${query}%`}
       GROUP BY customers.id, customers.name, customers.email, customers.image_url
       ORDER BY customers.name ASC
     `;
