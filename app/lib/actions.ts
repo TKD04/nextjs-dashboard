@@ -1,6 +1,8 @@
 'use server';
 
+import { signIn } from '@/auth';
 import { sql } from '@vercel/postgres';
+import { AuthError } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
@@ -113,4 +115,24 @@ export const deleteInvoice = async (id: string): Promise<void> => {
   await sql`DELETE FROM invoices WHERE id = ${id}`;
 
   revalidatePath('/dashboard/invoices');
+};
+
+export const authenticate = async (
+  _prevState: string | undefined,
+  formData: FormData,
+): Promise<string | undefined> => {
+  try {
+    await signIn('credentials', formData);
+    return undefined;
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case 'CredentialsSignin':
+          return 'Invalid credentials.';
+        default:
+          return 'Something went wrong.';
+      }
+    }
+    throw error;
+  }
 };
